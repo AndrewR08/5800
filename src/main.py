@@ -23,13 +23,13 @@ lec = race.get_driver('LEC')
 
 ver_laps = laps.pick_driver('VER')
 lec_laps = laps.pick_driver('LEC')
-print(laps)
+#print(laps)
 print()
-"""print(lec_laps)
+print(ver_laps)
 print(ver_laps.get_telemetry())
-print()
-print(lec_laps.get_telemetry())"""
+#print()
+#print(lec_laps.get_telemetry())
 
-
+#ver_laps.to_csv('data.csv', index=False)
 
 
