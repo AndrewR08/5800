@@ -14,15 +14,20 @@ pd.set_option("expand_frame_repr", False)
 #location of cache for data
 fastf1.Cache.enable_cache('D:/f1data')
 
+
+def format_circuits(circuit):
+    if isinstance(circuit, str):
+        circuit = circuit.replace(' ', '_')
+    return circuit
+
+
 years = [2018, 2019, 2020, 2021, 2022]
-circuits = ['Bahrain', 'Saudi_Arabia', 'Australia', 'Imola', 'Miami', 'Spain', 'Monaco', 'Azerbaijan', 'Canada',
-            'Great_Britain', 'Austria', 'France', 'Hungary', 'Belgium', 'Netherlands', 'Monza', 'Singapore', 'Japan',
-            'Aramco_United_States', 'Mexico', 'Brazil', 'Abu_Dhabi']
 
-schedule = fastf1.get_event_schedule(2017)
-print(schedule)
-
-"""for y in years:
+for y in years:
+    schedule = fastf1.get_event_schedule(y)
+    schedule = schedule[schedule['EventFormat'] != 'testing']
+    circuits = schedule.EventName
+    circuits = circuits.apply(format_circuits)
     for c in circuits:
         race = fastf1.get_session(y, c, 'R')
         race.load()
@@ -34,7 +39,7 @@ print(schedule)
 
         file = path + "/" + c + ".csv"
         print(file)
-        laps.to_csv(file, index=False)"""
+        laps.to_csv(file, index=False)
 
 """ver = race.get_driver('VER')
 lec = race.get_driver('LEC')
