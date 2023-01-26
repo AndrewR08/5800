@@ -4,15 +4,20 @@ import os
 
 # options for easier readability on df print
 pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', None)
-pd.set_option("expand_frame_repr", False)
+# pd.set_option("expand_frame_repr", False)
 
 
 # **fastf1 api only available for 2018 season and later**
 
-#location of cache for data
-fastf1.Cache.enable_cache('D:/f1data')
+def cache(pc):
+    if pc:
+        # location of cache for pc
+        fastf1.Cache.enable_cache('D:/f1data')
+    else:
+        # location of cahce for mac
+        fastf1.Cache.enable_cache('/Users/andrewreeves/Documents/ASU/fastf1')
 
 
 def format_circuits(circuit):
@@ -21,9 +26,12 @@ def format_circuits(circuit):
     return circuit
 
 
+# True for pc / False for mac
+cache(False)
+
 years = [2018, 2019, 2020, 2021, 2022]
 
-for y in years:
+"""for y in years:
     schedule = fastf1.get_event_schedule(y)
     schedule = schedule[schedule['EventFormat'] != 'testing']
     circuits = schedule.EventName
@@ -39,7 +47,7 @@ for y in years:
 
         file = path + "/" + c + ".csv"
         print(file)
-        laps.to_csv(file, index=False)
+        laps.to_csv(file, index=False)"""
 
 """ver = race.get_driver('VER')
 lec = race.get_driver('LEC')
@@ -54,8 +62,5 @@ print(ver_laps.get_telemetry())
 #print()
 #print(lec_laps.get_telemetry())"""
 
-
-"""race = fastf1.get_session(2018, 'Monaco', 'R')
-race.load()
-laps = race.laps
-print(laps)"""
+df = pd.read_csv('data/2022/United_States_Grand_Prix.csv')
+print(df)
