@@ -13,8 +13,13 @@ pd.set_option("expand_frame_repr", False)
 # **fastf1 api only available for 2018 season and later**
 # 103 different races - ~60 laps/race - 20 drivers/race = 123,600 rows of data
 
-#location of cache for data
-fastf1.Cache.enable_cache('D:/f1data')
+def cache(pc):
+    if pc:
+        # location of cache for pc
+        fastf1.Cache.enable_cache('D:/f1data')
+    else:
+        # location of cahce for mac
+        fastf1.Cache.enable_cache('/Users/andrewreeves/Documents/ASU/fastf1')
 
 
 def format_circuits(circuit):
@@ -60,6 +65,8 @@ def add_pitstop(df):
 
 
 def main():
+    # True for pc / False for mac
+    cache(False)
     df = pd.read_csv('data/2022/United_States_Grand_Prix.csv')
     #print(df)
     print(df['PitInTime'][0])
