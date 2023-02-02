@@ -11,7 +11,7 @@ pd.set_option("expand_frame_repr", False)
 
 
 # **fastf1 api only available for 2018 season and later**
-# 103 different races - ~60 laps/race - 20 drivers/race
+# 103 different races - ~60 laps/race - 20 drivers/race = 123,600 rows of data
 
 #location of cache for data
 fastf1.Cache.enable_cache('D:/f1data')
