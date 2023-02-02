@@ -1,4 +1,5 @@
 import fastf1
+import numpy as np
 import pandas as pd
 import os
 
@@ -54,9 +55,19 @@ print(ver_laps.get_telemetry())
 #print(lec_laps.get_telemetry())"""
 
 
+def add_pitstop(df):
+    df['PitLap'] = df.loc[~df['PitInTime'].isna(), 'LapNumber']
+
+
 def main():
     df = pd.read_csv('data/2022/United_States_Grand_Prix.csv')
+    #print(df)
+    print(df['PitInTime'][0])
+    add_pitstop(df)
+    print()
     print(df)
+    df.to_csv('data/2022/United_States_Grand_Prix_Fixed.csv', index=False)
+
 
 
 if __name__ == '__main__':
