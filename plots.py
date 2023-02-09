@@ -35,7 +35,7 @@ def plt_pit():
 
 def ff1_pit():
     year = 2022
-    circuit = 'Miami'
+    circuit = 'Monaco'
 
     # Load the session data
     race = fastf1.get_session(year, circuit, 'R')
@@ -96,7 +96,7 @@ def ff1_pit():
 
 def ff1_throttle():
     year = 2022
-    wknd = 5
+    wknd = 7
     ses = 'R'
     driver = 'NOR'
     colormap = mpl.cm.plasma
@@ -144,13 +144,15 @@ def ff1_throttle():
     # Show the plot
     plt.show()
 
+    #plt.savefig('data/Monaco/NOR_Throttle.png')
+
 
 def main():
     # True for pc / False for mac
-    cache(False)
+    cache(True)
 
     #plt_pit()
-    #ff1_pit()
+    ff1_pit()
     ff1_throttle()
 
 

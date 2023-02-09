@@ -1,0 +1,27 @@
+,374
+Time,0 days 03:49:21.832000
+DriverNumber,4
+LapTime,0 days 00:01:14.693000
+LapNumber,55
+PitOutTime,
+PitInTime,
+Sector1Time,0 days 00:00:19.751000
+Sector2Time,0 days 00:00:35.209000
+Sector3Time,0 days 00:00:19.733000
+Sector1SessionTime,0 days 03:48:26.890000
+Sector2SessionTime,0 days 03:49:02.099000
+Sector3SessionTime,0 days 03:49:21.832000
+SpeedI1,208.0
+SpeedI2,195.0
+SpeedFL,257.0
+SpeedST,277.0
+IsPersonalBest,True
+Compound,MEDIUM
+TyreLife,4.0
+FreshTyre,True
+Stint,5
+LapStartTime,0 days 03:48:07.139000
+Team,McLaren
+Driver,NOR
+TrackStatus,1
+IsAccurate,True

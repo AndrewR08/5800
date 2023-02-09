@@ -2,6 +2,7 @@ import fastf1
 import numpy as np
 import pandas as pd
 import os
+import json
 
 # options for easier readability on df print
 pd.set_option('display.max_columns', None)
@@ -46,35 +47,59 @@ def download_data():
                 os.makedirs(path)
 
 
-"""ver = race.get_driver('VER')
-lec = race.get_driver('LEC')
-#print(laps)
-
-ver_laps = laps.pick_driver('VER')
-lec_laps = laps.pick_driver('LEC')
-#print(laps)
-print()
-print(ver_laps)
-print(ver_laps.get_telemetry())
-#print()
-#print(lec_laps.get_telemetry())"""
-
-
-def add_pitstop(df):
+def add_pitstop(df, filename):
     df['PitLap'] = df.loc[~df['PitInTime'].isna(), 'LapNumber']
+    df.to_csv(filename, index=False)
+    return df
+
+
+def get_fastest_lap_data(year, name, s_type, driver=None):
+    session = fastf1.get_session(year, name, s_type)
+    session.load(telemetry=False)
+    # get specific drivers fastest lap
+    if driver == None:
+        lap = session.laps.pick_fastest()
+    else:
+        lap = session.laps.pick_driver(driver).pick_fastest()
+    return lap
+
+
+def get_lap_weather(lap):
+    return lap.get_weather_data()
+
+
+def get_session_weather(year, name, s_type):
+    session = fastf1.get_session(year, name, s_type)
+    session.load(telemetry=False)
+    return session.weather_data
+
+
+def get_car_data(year, name, s_type):
+    session = fastf1.get_session(year, name, s_type)
+    session.load(telemetry=True)
+    return session.car_data
 
 
 def main():
     # True for pc / False for mac
-    cache(False)
-    df = pd.read_csv('data/2022/United_States_Grand_Prix.csv')
-    #print(df)
-    print(df['PitInTime'][0])
-    add_pitstop(df)
-    print()
+    cache(True)
+    file = 'data/Monaco/Monaco_Grand_Prix.csv'
+    df = pd.read_csv('data/2022/Monaco_Grand_Prix.csv')
+    df = add_pitstop(df, file)
     print(df)
-    df.to_csv('data/2022/United_States_Grand_Prix_Fixed.csv', index=False)
+    fl = get_fastest_lap_data(2022, 'Monaco', 'R', 'NOR')
+    fl.to_csv('data/Monaco/NOR_FastestLap.csv')
+    print(fl)
 
+    weather = get_lap_weather(fl)
+    weather.to_csv('data/Monaco/NOR_FL_Weather.csv')
+    print(weather)
+
+    s_weather = get_session_weather(2022, 'Monaco', 'R')
+    weather.to_csv('data/Monaco/Weather.csv')
+    print(s_weather)
+
+    s_car_data = get_car_data(2022, 'Monaco', 'R')
 
 
 if __name__ == '__main__':
