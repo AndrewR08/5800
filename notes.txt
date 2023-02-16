@@ -1,0 +1,7 @@
+predict finishing order and time to cross finish line (lap time)
+-- at beginning of given lap, predict time to finish lap
+predict gap to leader for all drivers and end of next lap -> extrapolate to last lap for final order
+
+simpelest model that works
+- train, test, validation
+build framework for different models

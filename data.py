@@ -5,10 +5,10 @@ import os
 import json
 
 # options for easier readability on df print
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_colwidth', None)
-pd.set_option("expand_frame_repr", False)
+#pd.set_option('display.max_columns', None)
+#pd.set_option('display.max_rows', None)
+#pd.set_option('display.max_colwidth', None)
+#pd.set_option("expand_frame_repr", False)
 
 
 # **fastf1 api only available for 2018 season and later**
@@ -80,10 +80,23 @@ def get_car_data(year, name, s_type):
     return session.car_data
 
 
+def get_standings(year, name, s_type):
+    session = fastf1.get_session(year, name, s_type)
+    session.load(telemetry=False)
+    laps = session.laps
+    standings = pd.DataFrame(laps)
+    """standings = standings.drop(['Time', 'LapTime', 'PitOutTime', 'PitInTime', 'Sector1Time', 'Sector2Time', 'Sector3Time',
+                    'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime', 'SpeedI1', 'SpeedI2', 'SpeedFL',
+                    'SpeedST', 'IsPersonalBest', 'Compound', 'TyreLife', 'FreshTyre', 'Stint', 'LapStartTime',
+                    'TrackStatus', 'IsAccurate'], axis=1)"""
+    uniq = standings.drop_duplicates(subset='DriverNumber', keep='last')
+    return uniq
+
+
 def main():
     # True for pc / False for mac
-    cache(True)
-    file = 'data/Monaco/Monaco_Grand_Prix.csv'
+    cache(False)
+    """file = 'data/Monaco/Monaco_Grand_Prix.csv'
     df = pd.read_csv('data/2022/Monaco_Grand_Prix.csv')
     df = add_pitstop(df, file)
     print(df)
@@ -99,7 +112,11 @@ def main():
     weather.to_csv('data/Monaco/Weather.csv')
     print(s_weather)
 
-    s_car_data = get_car_data(2022, 'Monaco', 'R')
+    s_car_data = get_car_data(2022, 'Monaco', 'R')"""
+
+    standings = get_standings(2022, 'Monaco', 'R')
+    print(standings)
+    standings.to_csv('data/Monaco/Results.csv', index=False)
 
 
 if __name__ == '__main__':
