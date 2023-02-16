@@ -80,17 +80,17 @@ def get_car_data(year, name, s_type):
     return session.car_data
 
 
-def get_standings(year, name, s_type):
+def get_results(year, name, s_type):
     session = fastf1.get_session(year, name, s_type)
     session.load(telemetry=False)
     laps = session.laps
-    standings = pd.DataFrame(laps)
+    results = pd.DataFrame(laps)
     """standings = standings.drop(['Time', 'LapTime', 'PitOutTime', 'PitInTime', 'Sector1Time', 'Sector2Time', 'Sector3Time',
                     'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime', 'SpeedI1', 'SpeedI2', 'SpeedFL',
                     'SpeedST', 'IsPersonalBest', 'Compound', 'TyreLife', 'FreshTyre', 'Stint', 'LapStartTime',
                     'TrackStatus', 'IsAccurate'], axis=1)"""
-    uniq = standings.drop_duplicates(subset='DriverNumber', keep='last')
-    return uniq
+    results = results.drop_duplicates(subset='DriverNumber', keep='last')
+    return results
 
 
 def main():
@@ -114,9 +114,8 @@ def main():
 
     s_car_data = get_car_data(2022, 'Monaco', 'R')"""
 
-    standings = get_standings(2022, 'Monaco', 'R')
-    print(standings)
-    standings.to_csv('data/Monaco/Results.csv', index=False)
+    results = get_results(2022, 'Monaco', 'R')
+    #results.to_csv('data/Monaco/Results.csv', index=False)
 
 
 if __name__ == '__main__':
