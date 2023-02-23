@@ -18,11 +18,13 @@ def cache(pc):
 
 def plt_pit():
     df = pd.read_csv('data/2022/United_States_Grand_Prix_Fixed.csv')
-    print(df)
+    #print(df)
 
-    print(len(df['PitLap'].unique()))
+    #print(len(df['PitLap'].unique()))
     x = df['PitLap'].unique()
+    print(x)
     y = df['Driver'].unique()
+    print(y)
     fig, ax = plt.subplots()
     ax.scatter(x, y)
     loc = plticker.MultipleLocator(base=5.0)  # this locator puts ticks at regular intervals
@@ -149,11 +151,11 @@ def ff1_throttle():
 
 def main():
     # True for pc / False for mac
-    cache(True)
+    cache(False)
 
-    #plt_pit()
-    ff1_pit()
-    ff1_throttle()
+    plt_pit()
+    #ff1_pit()
+    #ff1_throttle()
 
 
 if __name__ == '__main__':

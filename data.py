@@ -58,7 +58,7 @@ def get_fastest_lap_data(year, name, s_type, driver=None):
     session = fastf1.get_session(year, name, s_type)
     session.load(telemetry=False)
     # get specific drivers fastest lap
-    if driver == None:
+    if driver is None:
         lap = session.laps.pick_fastest()
     else:
         lap = session.laps.pick_driver(driver).pick_fastest()
