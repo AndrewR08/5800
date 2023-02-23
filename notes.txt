@@ -5,3 +5,16 @@ predict gap to leader for all drivers and end of next lap -> extrapolate to last
 simpelest model that works
 - train, test, validation
 build framework for different models
+
+start with 1 output linear regression keras model
+
+time series forecasting - look at previous number of laps
+
+train test valid - 3 years for train, 1 year test, 1 year vaild
+
+rmse for time, look at ranking for matchup, area under roc curve using matrix comparisons
+
+get 20 laps as input -> guess next lap time
+
+naive way - predict next lap time as the current lap and plot difference
+next week: visualize basic naive model 

@@ -2,6 +2,7 @@ import fastf1
 import numpy as np
 import pandas as pd
 import os
+import requests
 import json
 
 # options for easier readability on df print
@@ -93,6 +94,14 @@ def get_results(year, name, s_type):
     return results
 
 
+def get_standings(year, round):
+    url = "https://ergast.com/api/f1/" + year + "/" + round + "/current/driverStandings.json"
+    response = requests.get(url)
+    data = response.json()
+    drivers_standings = data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']  # noqa: E501
+    return drivers_standings
+
+
 def main():
     # True for pc / False for mac
     cache(False)
@@ -116,6 +125,13 @@ def main():
 
     results = get_results(2022, 'Monaco', 'R')
     #results.to_csv('data/Monaco/Results.csv', index=False)
+
+    # create method to add points for race results df
+    # iterate through df and use list of points (18, 15, ...) to assign to drivers in results list
+    points = [18, 15, 12, 10, 8, 6, 4, 2, 1]
+
+    standings = get_standings('2022', '1')
+    print(standings)
 
 
 if __name__ == '__main__':
