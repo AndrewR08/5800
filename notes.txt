@@ -17,4 +17,13 @@ rmse for time, look at ranking for matchup, area under roc curve using matrix co
 get 20 laps as input -> guess next lap time
 
 naive way - predict next lap time as the current lap and plot difference
-next week: visualize basic naive model 
+next week: visualize basic naive model
+
+
+** ff1.utils.delta_time() over all laps
+    - for single driveer:
+        - start at lap 2: use previous lap as reference, current lap as compare
+        - sum distance over entire race
+    - for two drivers:
+        - start at lap 1: use driver1 as reference, driver2 as comparison
+        - sum distance over entire race

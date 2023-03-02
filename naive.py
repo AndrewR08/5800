@@ -2,10 +2,13 @@ import fastf1
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # options for easier readability on df print
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
+
+
 # pd.set_option('display.max_colwidth', None)
 # pd.set_option("expand_frame_repr", False)
 
@@ -32,32 +35,39 @@ def predict_laps(df):
         else:
             laps_pred.at[i, 'LapTime'] = df.at[i - 1, 'LapTime']
 
-    """values = {'LapTime': '0 days 00:00:00.000000'}
-    laps_pred = laps_pred.fillna(values)"""
-
-    laps_pred.drop(['Time', 'PitOutTime', 'PitInTime', 'Sector1Time', 'Sector2Time', 'Sector3Time',
-                    'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime', 'SpeedI1', 'SpeedI2', 'SpeedFL',
-                    'SpeedST', 'IsPersonalBest', 'Compound', 'TyreLife', 'FreshTyre', 'Stint', 'LapStartTime',
-                    'TrackStatus', 'IsAccurate', 'LapStartDate', 'PitLap'], axis=1, inplace=True)
     return laps_pred
 
 
-def plot_lap_diff(laps, p_laps):
-    fig, axes = plt.subplots(1, 2)
-    #print(laps['LapTime'].to_numpy())
-    x = laps['LapNumber'].values
-    y = laps['LapTime'].values
-    print(x.shape)
-    axes[0, 0].plot(x, y)
-    axes[0, 0].set_title('Actual Laps')
-    axes[0, 0].set_xlabel('Lap Number')
-    axes[0, 0].set_ylabel('Lap Time')
+def fix_time(laps):
+    for i in range(len(laps)):
+        lap = laps.at[i, 'LapTime']
+        if not pd.isna(lap):
+            lap = lap[7:15]
+            laps.at[i, 'LapTime'] = datetime.strptime(lap, '%H:%M:%S').second + \
+                                    datetime.strptime(lap, '%H:%M:%S').minute * 60 \
+                                    + datetime.strptime(lap, '%H:%M:%S').hour * 3600
+        else:
+            laps.at[i, 'LapTime'] = 0
 
-    axes[0, 1].plot(p_laps['LapNumber'].values, p_laps['LapTime'].values)
-    axes[0, 1].set_title('Predicted Laps')
-    axes[0, 1].set_xlabel('Lap Number')
-    axes[0, 1].set_ylabel('Lap Time')
-    plt.tight_layout()
+    laps.drop(['Time', 'PitOutTime', 'PitInTime', 'Sector1Time', 'Sector2Time', 'Sector3Time',
+               'Sector1SessionTime', 'Sector2SessionTime', 'Sector3SessionTime', 'SpeedI1', 'SpeedI2', 'SpeedFL',
+               'SpeedST', 'IsPersonalBest', 'Compound', 'TyreLife', 'FreshTyre', 'Stint', 'LapStartTime',
+               'TrackStatus', 'IsAccurate', 'LapStartDate', 'PitLap'], axis=1, inplace=True)
+
+    laps = laps[laps.LapTime != 0]
+    return laps.reset_index()
+
+
+def plot_lap_diff(laps, p_laps):
+    x = laps['LapNumber'].values
+    y1 = laps['LapTime'].values
+    y2 = p_laps['LapTime'].values
+    plt.scatter(x, y1, color='b', label='actual')
+    plt.scatter(x, y2, color='r', alpha=0.5, label='predicted')
+    plt.xlabel('Lap Number')
+    plt.ylabel('Lap Time')
+    plt.legend()
+    plt.show()
 
 
 def main():
@@ -65,8 +75,8 @@ def main():
     cache(False)
 
     laps = pd.read_csv('data/Monaco/Monaco_Grand_Prix.csv')
+    laps = fix_time(laps)
     p_laps = predict_laps(laps)
-    #print(p_laps)
 
     plot_lap_diff(laps, p_laps)
 
