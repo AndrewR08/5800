@@ -31,7 +31,7 @@ def plot_delta(year, race, d1, d2, lap_num=8):
     print("\n--d2 lap--\n", d2_lap)
 
     d1_name = d1_lap.Driver
-    d2_name = d2_lap.Driver
+    d2_name = d2_lap.Drivera
 
     delta_time, ref_tel, compare_tel = utils.delta_time(d1_lap, d2_lap)
 
@@ -49,19 +49,42 @@ def plot_delta(year, race, d1, d2, lap_num=8):
     plt.show()
 
 
-def time_dist(year, race, d1, d2):
+def time_dist(year, race, d1, d2, lap_num=8):
     plotting.setup_mpl()
 
-    session = ff1.get_session(year, race, 'Q')
+    session = ff1.get_session(year, race, 'R')
     session.load()
-    d1_lap = session.laps.pick_driver(d1).pick_fastest()
-    d2_lap = session.laps.pick_driver(d2).pick_fastest()
+    d1_laps = session.laps.pick_driver(d1)
+    d1_lap = d1_laps[d1_laps['LapNumber'] == lap_num].iloc[0]
+    d2_laps = session.laps.pick_driver(d2)
+    d2_lap = d2_laps[d2_laps['LapNumber'] == lap_num].iloc[0]
+    """print("--d1 lap--\n", d1_lap)
+    print("\n--d2 lap--\n", d2_lap)"""
+
+    d1_name = d1_lap.Driver
+    d2_name = d2_lap.Driver
+
+    ref = d1_lap.get_car_data(interpolate_edges=True).add_distance()
+    print(ref.columns)
+    print("---ref---\n", ref[['Time', 'Distance']])
+    comp = d2_lap.get_car_data(interpolate_edges=True).add_distance()
+    print("\n---comp---\n", comp[['Time', 'Distance']])
+
+    fig, ax = plt.subplots()
+    ax.plot(ref['Time'], ref['Distance'], color=plotting.team_color(d1_lap['Team']))
+    ax.plot(comp['Time'], comp['Distance'], color=plotting.team_color(d2_lap['Team']))
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Distance")
+    plt.title(d1_name + "/" + d2_name + " Lap Time vs Distance")
+    plt.legend()
+    plt.show()
 
 
 def main():
     cache(False)
 
-    plot_delta(2022, 'Monaco', '4', '16', 32)
+    #plot_delta(2022, 'Monaco', '4', '16', 32)
+    time_dist(2022, 'Monaco', '4', '16', 32)
 
 
 if __name__ == '__main__':
