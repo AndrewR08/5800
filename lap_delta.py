@@ -75,16 +75,39 @@ def time_dist(year, race, d1, d2, lap_num=8):
     ax.plot(comp['Time'], comp['Distance'], color=plotting.team_color(d2_lap['Team']))
     ax.set_xlabel("Time")
     ax.set_ylabel("Distance")
-    plt.title(d1_name + "/" + d2_name + " Lap Time vs Distance")
-    plt.legend()
+    plt.title(d1_name + "/" + d2_name + " Lap Time vs Distance (Lap " + str(lap_num) + ")")
+    plt.show()
+
+
+def time_dist_all(year, race, drivers, lap_num=8):
+    plotting.setup_mpl()
+    fig, ax = plt.subplots()
+
+    session = ff1.get_session(year, race, 'R')
+    session.load()
+
+    for i in range(len(drivers)):
+        laps = session.laps.pick_driver(drivers[i])
+        lap = laps[laps['LapNumber'] == lap_num].iloc[0]
+
+        ref = lap.get_car_data(interpolate_edges=True).add_distance()
+        ax.plot(ref['Time'], ref['Distance'], color=plotting.team_color(lap['Team']))
+
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Distance")
+    plt.title("Lap Time vs Distance (Lap " + str(lap_num) + ")")
     plt.show()
 
 
 def main():
     cache(False)
 
+    drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18', '6', '24', '22', '23',
+               '47', '20']
+
     #plot_delta(2022, 'Monaco', '4', '16', 32)
     time_dist(2022, 'Monaco', '4', '16', 32)
+    time_dist_all(2022, 'Monaco', drivers, 8)
 
 
 if __name__ == '__main__':
