@@ -73,8 +73,8 @@ def time_dist(year, race, d1, d2, lap_num=8):
     fig, ax = plt.subplots()
     ax.plot(ref['Time'], ref['Distance'], color=plotting.team_color(d1_lap['Team']))
     ax.plot(comp['Time'], comp['Distance'], color=plotting.team_color(d2_lap['Team']))
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Distance")
+    ax.set_xlabel("Time (m:ss)")
+    ax.set_ylabel("Distance (m)")
     plt.title(d1_name + "/" + d2_name + " Lap Time vs Distance (Lap " + str(lap_num) + ")")
     plt.show()
 
@@ -93,8 +93,8 @@ def time_dist_all(year, race, drivers, lap_num=8):
         ref = lap.get_car_data(interpolate_edges=True).add_distance()
         ax.plot(ref['Time'], ref['Distance'], color=plotting.team_color(lap['Team']))
 
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Distance")
+    ax.set_xlabel("Time (m:ss)")
+    ax.set_ylabel("Distance (m)")
     plt.title("Lap Time vs Distance (Lap " + str(lap_num) + ")")
     plt.show()
 
@@ -106,7 +106,7 @@ def main():
                '47', '20']
 
     #plot_delta(2022, 'Monaco', '4', '16', 32)
-    time_dist(2022, 'Monaco', '4', '16', 32)
+    #time_dist(2022, 'Monaco', '4', '16', 32)
     time_dist_all(2022, 'Monaco', drivers, 8)
 
 
