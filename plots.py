@@ -149,11 +149,14 @@ def ff1_throttle():
     #plt.savefig('data/Monaco/NOR_Throttle.png')
 
 
+def time_dist():
+    pass
+
 def main():
     # True for pc / False for mac
     cache(False)
 
-    plt_pit()
+    #plt_pit()
     #ff1_pit()
     #ff1_throttle()
 

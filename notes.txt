@@ -27,3 +27,18 @@ next week: visualize basic naive model
     - for two drivers:
         - start at lap 1: use driver1 as reference, driver2 as comparison
         - sum distance over entire race
+
+
+time d0 d1 d2
+- same time over all drivers laptimes
+
+graph: time vs distance
+
+speed = d/t -> speed * dt -> distance -> sum
+
+start w/ lapwise  distance
+
+**107% rule? : 107% of drivers fastest lap (in session)
+
+  ** time on x axis and distance on y axis
+    - neural network to predict next lap distances for future
