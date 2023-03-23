@@ -42,3 +42,4 @@ start w/ lapwise  distance
 
   ** time on x axis and distance on y axis
     - neural network to predict next lap distances for future
+
