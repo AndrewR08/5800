@@ -3,6 +3,7 @@ import pandas as pd
 from fastf1 import plotting
 from fastf1 import utils
 from matplotlib import pyplot as plt
+from datetime import datetime, timedelta
 
 # options for easier readability on df print
 pd.set_option('display.max_columns', None)
@@ -182,7 +183,7 @@ def time_dist_race_two(year, race, drivers, num_laps=0):
     plt.show()
 
 
-def time_dist_race_all(year, race, drivers):
+def time_dist_race_all(year, race, drivers, num_laps=None):
     plotting.setup_mpl()
     fig, ax = plt.subplots()
 
@@ -191,14 +192,16 @@ def time_dist_race_all(year, race, drivers):
     session = ff1.get_session(year, race, 'R')
     session.load()
 
-    #num_laps = max(session.laps.LapNumber)
-
     for i in range(len(drivers)):
         d = drivers[i]
         d_laps = session.laps.pick_driver(d)
 
-        num_laps = max(d_laps.LapNumber)
-        for j in range(num_laps):
+        if num_laps is None:
+            laps = max(d_laps.LapNumber)
+        else:
+            laps = num_laps
+
+        for j in range(laps):
             d_lap = d_laps[d_laps['LapNumber'] == (j+1)].iloc[0]
             ref = d_lap.get_car_data(interpolate_edges=True).add_distance()
             ref = ref[['Time', 'Distance']]
@@ -215,15 +218,17 @@ def time_dist_race_all(year, race, drivers):
             ref['DriverNumber'] = d_laps.DriverNumber.iloc[0]
             laps_df = pd.concat([laps_df, ref])
 
-            ax.plot(ref['Time'], ref['Distance'], color=plotting.driver_color(d_laps.Driver.iloc[0]))
+        ax.plot(laps_df['Time'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
+                laps_df['Distance'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
+                color=plotting.driver_color(d_laps.Driver.iloc[0]), label=d_laps.Driver.iloc[0])
 
     # laps_df['Distance'] = laps_df['Distance'] / 1000
     # print(laps_df)
-    # laps_df.to_csv('data/Monaco/MonacoTimeDistAll.csv', index=False)
+    # laps_df.to_csv('data/Monaco/MonacoTimeDist.csv', index=False)
 
     ax.set_xlabel("Time (h:mm)")
     ax.set_ylabel("Distance (m)")
-    #ax.legend(loc='center right')
+    ax.legend(loc='center right')
     plt.title(race + " Lap Time vs Distance")
     plt.show()
 
@@ -234,12 +239,16 @@ def main():
     drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18', '6', '24', '22', '23',
                '47', '20']
 
-    #plot_delta(2022, 'Monaco', '4', '16', 32)
-    #time_dist(2022, 'Monaco', '4', '16', 32)
-    #time_dist_all(2022, 'Monaco', drivers, 8)
 
-    #---lap 7 OCO pass VET---
-    #time_dist_race_two(2022, 'Monaco', ['OCO', 'VET'], 3)
+    # drivers = ['VER', 'PER', 'LEC', 'SAI', 'RUS', 'HAM', 'NOR', 'RIC', 'ALO', 'OCO', 'BOT', 'ZHO', 'GAS', 'TSU',
+    #            'STR', 'VET', 'MAG', 'MSC', 'ALB', 'LAT']
+
+    # plot_delta(2022, 'Monaco', '4', '16', 32)
+    # time_dist(2022, 'Monaco', '4', '16', 32)
+    # time_dist_all(2022, 'Monaco', drivers, 8)
+
+    # ---lap 7 OCO pass VET---
+    # time_dist_race_two(2022, 'Monaco', ['OCO', 'VET'], 10)
     time_dist_race_all(2022, 'Monaco', drivers)
 
 
