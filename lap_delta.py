@@ -271,26 +271,25 @@ def time_gap_race_all(year, race, drivers, num_laps=None):
             ref = ref[['Time', 'Distance']]
 
             # use j != 1 to exclude lap 1
-            """if j != 1:
-                # if j != 0:
+            if j != 0:
                 ref_len = len(laps_df)
                 last_ref_dist = laps_df['Distance'].iloc[ref_len - 1]
                 last_ref_time = laps_df['Time'].iloc[ref_len - 1]
                 ref['Time'] = ref['Time'] + last_ref_time
-                ref['Distance'] = ref['Distance'] + last_ref_dist"""
+                ref['Distance'] = ref['Distance'] + last_ref_dist
 
             ref['LapNumber'] = d_lap.LapNumber
             ref['Driver'] = d_laps.Driver.iloc[0]
             ref['DriverNumber'] = d_laps.DriverNumber.iloc[0]
             max_dist = max(ref['Distance'])
-            if max_dist > race_dist:
-                ref['Distance'] = ref['Distance'].apply(lambda row: (race_dist/max_dist)*row)
+            ref_dist = race_dist * d_lap.LapNumber
+            ref['Distance'] = ref['Distance'].apply(lambda row: (ref_dist/max_dist)*row)
 
             laps_df = pd.concat([laps_df, ref]).reset_index(drop=True)
 
-        """ax.plot(laps_df['Time'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
+        ax.plot(laps_df['Time'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
                 laps_df['Distance'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
-                color=plotting.driver_color(d_laps.Driver.iloc[0]), label=d_laps.Driver.iloc[0])"""
+                color=plotting.driver_color(d_laps.Driver.iloc[0]), label=d_laps.Driver.iloc[0])
 
     """d1 = laps_df['Distance'].iloc[laps_df.index[laps_df['DriverNumber'] == '16']]
     d2 = laps_df['Distance'].iloc[laps_df.index[laps_df['DriverNumber'] == '55']]
@@ -322,17 +321,22 @@ def time_gap_race_all(year, race, drivers, num_laps=None):
 
     laps_df['TimeDiff'] = laps_df['Time'].diff()
     laps_df['TimeDiff'] = laps_df['TimeDiff'].apply(lambda row: row.total_seconds())
-    laps_df['TimeDiff'].iloc[559] = 0
     laps_df['TimeDiff'].fillna(0)
-    laps_df['TimeDiff'].plot(kind='hist', edgecolor='black', xticks=[0, 0.16, 0.28, 0.4, 0.5, 0.75, 1])
-    print(laps_df)
-    #laps_df.to_csv('data/Monaco/MonacoTD_LEC_SAI_L1_TEST.csv', index=False)
+    laps_df['TimeDiff'].loc[laps_df['TimeDiff'] < 0] = 0
+    """plot distribution of time difference intervals in histogram"""
+    # laps_df['TimeDiff'].plot(kind='hist', edgecolor='black', xticks=[0, 0.125, 0.25, 0.375, 0.5, 0.75, 1])
 
-    """ax.set_xlabel("Time (h:mm)")
+    """max time = 0 days 01:58:30.069000"""
+    # print(max(laps_df['Time']))
+
+    # print(laps_df)
+    laps_df.to_csv('data/Monaco/MonacoTD_TEST.csv', index=False)
+
+    ax.set_xlabel("Time (h:mm)")
     ax.set_ylabel("Distance (m)")
     ax.legend(loc='center right')
-    plt.title(race + " " + str(year) + " Lap Time vs Distance Gap")
-    plt.show()"""
+    plt.title(race + " " + str(year) + " Lap Time vs Distance")
+    plt.show()
 
 
 def main():
@@ -360,7 +364,7 @@ def main():
     """graph all drivers time vs distance for entire race"""
     #time_dist_race_all(2022, 'Monaco', drivers)
 
-    time_gap_race_all(2022, 'Monaco', ['LEC', 'SAI'], 1)
+    time_gap_race_all(2022, 'Monaco', drivers)
 
 
 if __name__ == '__main__':
