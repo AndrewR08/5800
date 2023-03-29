@@ -42,3 +42,5 @@ next: plot all drivers for entire race
 -- exclude first lap? --
 
 *** need to interpolate distances using smallest time intervals ***
+
+scale distances to known lap distance
