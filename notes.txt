@@ -38,3 +38,7 @@ speed = d/t -> speed * dt -> distance -> sum
 
 next: plot all drivers for entire race
 - use leader distance to calculate differences to every driver and use as y axis
+
+-- exclude first lap? --
+
+*** need to interpolate distances using smallest time intervals ***
