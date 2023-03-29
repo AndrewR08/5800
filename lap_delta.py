@@ -228,35 +228,45 @@ def time_dist_race_all(year, race, drivers, num_laps=None):
             ref['DriverNumber'] = d_laps.DriverNumber.iloc[0]
             ref['MaxDistance'] = max(ref['Distance'])
 
-            laps_df = pd.concat([laps_df, ref])
+            laps_df = pd.concat([laps_df, ref]).reset_index()
 
-        # *** bad!! create separate columns for each driver distance
-        #dist_col = 'Distance_' + d_laps.Driver.iloc[0]
-        #laps_df[dist_col] = ref['Distance']
-
-        ax.plot(laps_df['Time'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
+        """ax.plot(laps_df['Time'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
                 laps_df['Distance'].loc[laps_df['Driver'] == d_laps.Driver.iloc[0]],
-                color=plotting.driver_color(d_laps.Driver.iloc[0]), label=d_laps.Driver.iloc[0])
+                color=plotting.driver_color(d_laps.Driver.iloc[0]), label=d_laps.Driver.iloc[0])"""
 
-        #print(str(d_laps.Driver.iloc[0]) + " " + str(max(laps_df['Time'].loc[laps_df['DriverNumber'] == d])) +
+        # print(str(d_laps.Driver.iloc[0]) + " " + str(max(laps_df['Time'].loc[laps_df['DriverNumber'] == d])) +
         #      " // " + str(max(laps_df['Distance'].loc[laps_df['DriverNumber'] == d])))
 
-    #print()
-    #print(min(laps_df['MaxDistance']))
+    laps_df.drop(columns=['level_0', 'index'], inplace=True)
 
-    """
-    # *** bad!!! - way to get distance gap and seperate columns ***
-    # leader driver number
-    leader_num = 16
-    #laps_df.dropna(inplace=True)
-    laps_df.drop(columns=['Distance'], inplace=True)
-    laps_df['DistanceGap'] = laps_df.apply(lambda row: (row['Distance_LEC'] - row['Distance_SAI']), axis=1)
-    laps_df['LeaderGap'] = 0
-    ax.plot(laps_df['Time'], laps_df['DistanceGap'],
-            color='red', label='SAI')
-    """
+    d1 = laps_df['Distance'].iloc[laps_df.index[laps_df['DriverNumber'] == '16']]
+    d2 = laps_df['Distance'].iloc[laps_df.index[laps_df['DriverNumber'] == '55']]
+    ld1 = len(d1)
+    ld2 = len(d2)
 
-    print(laps_df)
+    t1 = laps_df['Time'].iloc[laps_df.index[laps_df['DriverNumber'] == '16']]
+    t2 = laps_df['Time'].iloc[laps_df.index[laps_df['DriverNumber'] == '55']]
+    lt1 = len(t1)
+    lt2 = len(t2)
+
+    if ld1 < ld2:
+        ld_diff = ld2 - ld1
+        d1 = pd.concat([d1, pd.Series([max(d2)]*ld_diff)], axis=0, join='outer', ignore_index=True).reset_index(drop=True)
+        d2 = d2.reset_index(drop=True)
+        ld1 = len(d1)
+        ld2 = len(d2)
+
+        lt_diff = lt2 - lt1
+        t1 = pd.concat([t1, pd.Series([max(t2)]*lt_diff)], axis=0, join='outer', ignore_index=True).reset_index(drop=True)
+        t2 = t2.reset_index(drop=True)
+        lt1 = len(t1)
+        lt2 = len(t2)
+
+    d_diff = d1 - d2
+    test = pd.concat([t1, t2, d_diff], axis=1, ignore_index=True)
+    print(test)
+    ax.plot(t1, d_diff, color='red')
+    #print(laps_df)
     #laps_df.to_csv('data/Monaco/MonacoTD_LEC_SAI_L1_TEST.csv', index=False)
 
     ax.set_xlabel("Time (h:mm)")
