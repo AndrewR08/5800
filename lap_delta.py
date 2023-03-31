@@ -5,6 +5,9 @@ from fastf1 import utils
 from matplotlib import pyplot as plt
 import numpy as np
 import datetime
+import math
+from scipy import stats
+
 
 # options for easier readability on df print
 pd.set_option('display.max_columns', None)
@@ -20,15 +23,6 @@ def cache(pc):
     else:
         # location of cahce for mac
         ff1.Cache.enable_cache('/Users/andrewreeves/Documents/ASU/fastf1')
-
-
-def sub(a, b):
-    return a-b
-
-
-def custom_delta(ref_lap, com_lap):
-    ref = ref_lap.get_car_data(interpolate_edges=True).add_distance()
-    comp = com_lap.get_car_data(interpolate_edges=True).add_distance()
 
 
 def plot_delta(year, race, d1, d2, lap_num=8):
@@ -61,7 +55,7 @@ def plot_delta(year, race, d1, d2, lap_num=8):
     ax.set_xlabel("<-- " + d2_name + " ahead | " + d1_name + " ahead -->")
     ax.set_ylabel("Distance")
     plt.title('Lap Time Delta (Actual= ' + actual_gap + ' s)')
-    #plt.show()
+    # plt.show()
 
 
 def time_dist(year, race, d1, d2, lap_num=8):
@@ -260,21 +254,26 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
         for i in range(len(drivers)):
             d = drivers[i]
             d_laps = session.laps.pick_driver(d)
-
+            #print("*****"+d_laps.Driver.iloc[0]+"*****\n")
             if num_laps is None:
                 laps = max(d_laps.LapNumber)
             else:
                 laps = num_laps
 
             # use range(1, laps+1) to exclude lap 1
-            for j in range(laps):
-                # for j in range(laps):
-                d_lap = d_laps[d_laps['LapNumber'] == (j + 1)].iloc[0]
-                ref = d_lap.get_car_data(interpolate_edges=True).add_distance()
+            for j in range(1, laps + 1):
+                if j < laps:
+                    d_lap = d_laps[d_laps['LapNumber'] == (j + 1)].iloc[0]
+                else:
+                    d_lap = d_laps[d_laps['LapNumber'] == j].iloc[0]
+
+                ref = d_lap.get_car_data(interpolate_edges=True)
+                #if j == 1: ref.to_csv('data/Monaco/RAW_REF2.csv', index=False)
+                ref = ref.add_distance()
                 ref = ref[['Time', 'Distance']]
 
                 # use j != 1 to exclude lap 1
-                if j != 0:
+                if j != 1:
                     ref_len = len(laps_df)
                     last_ref_dist = laps_df['Distance'].iloc[ref_len - 1]
                     last_ref_time = laps_df['Time'].iloc[ref_len - 1]
@@ -286,7 +285,7 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
                 ref['DriverNumber'] = d_laps.DriverNumber.iloc[0]
                 max_dist = max(ref['Distance'])
                 ref_dist = race_dist * d_lap.LapNumber
-                ref['Distance'] = ref['Distance'].apply(lambda row: (ref_dist/max_dist)*row)
+                ref['Distance'] = ref['Distance'].apply(lambda row: (ref_dist / max_dist) * row)
 
                 laps_df = pd.concat([laps_df, ref]).reset_index(drop=True)
 
@@ -298,40 +297,49 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
         # laps_df['TimeDiff'].plot(kind='hist', edgecolor='black', xticks=[0, 0.125, 0.25, 0.375, 0.5, 0.75, 1])
 
         # print(laps_df)
-        laps_df.to_csv('data/Monaco/MonacoTD_TESTALL.csv', index=False)
+        laps_df.to_csv('data/Monaco/MonacoTD_lapsdf_TEST3.csv', index=False)
 
         """ *** max time = 0 days 01:58:30.069000 // 7110.069s *** """
+        max_time = math.ceil(max(laps_df['Time']).total_seconds())
+        #print(max_time)
         laps_df_new = pd.DataFrame()
-        t = np.linspace(0, 7111, 39505)
-        print(t)
+        t = np.linspace(0, max_time, math.floor(max_time / 0.4))  # use 0.18s sample rate
         laps_df_new['Time'] = t
 
         for d in drivers:
             tp = laps_df['Time'].loc[laps_df['DriverNumber'] == d].apply(lambda row: row.total_seconds())
             dp = laps_df['Distance'].loc[laps_df['DriverNumber'] == d]
             d_new = np.interp(t, tp, dp)
-            laps_df_new['Distance_'+str(laps_df.Driver.loc[laps_df.DriverNumber == d].iloc[0])] = d_new
+            laps_df_new['Distance_' + str(laps_df.Driver.loc[laps_df.DriverNumber == d].iloc[0])] = d_new
 
-        laps_df_new.to_csv('data/Monaco/MonacoTD_TEST.csv', index=False)
+        df = laps_df_new
 
-    df = pd.read_csv(df_path)
-    df['Time'] = df['Time'].apply(lambda row: datetime.timedelta(seconds=row))
+    else:
+        df = pd.read_csv(df_path)
+
+    # df['Time'] = df['Time'].apply(lambda row: datetime.timedelta(seconds=row))
     leader = str(df.columns[1])[9:]
-    print(leader)
+    #print(leader)
     for i in range(len(drivers)):
-        d = str(df.columns[i+1])[9:]
+        d = str(df.columns[i + 1])[9:]
         if d != leader:
-            df['DistanceGap_'+d] = df['Distance_'+leader] - df['Distance_'+d]
-            ax.plot(df['Time'], df['DistanceGap_'+d],
+            df['DistanceGap_' + d] = df['Distance_' + leader] - df['Distance_' + d]
+            # df['DistanceGap_'+d] = df['DistanceGap_'+d].loc[df['DistanceGap_'+d] > 3337].apply(lambda row: 0)
+            #df = df[(np.abs(stats.zscore(df)) < 2).all(axis=1)]
+            ax.plot(df['Time'].apply(lambda row: datetime.timedelta(seconds=row)), df['DistanceGap_' + d],
                     color=plotting.driver_color(d),
                     label=d)
+    df.to_csv('data/Monaco/__GAP__.csv', index=False)
 
+    ax.set_ylim(bottom= -3337, top=3337)
     ax.set_xlabel("Time (h:mm)")
-    ax.set_ylabel("Distance (m)")
-    ax.legend(loc='upper center',
+    ax.set_ylabel("Distance Gap (m)")
+    ax.legend(loc='lower center',
               ncol=4, fancybox=True, shadow=True)
     plt.title(race + " " + str(year) + " Time vs Distance Gap to Leader")
     plt.show()
+
+    #df.to_csv('data/Monaco/MonacoTD_TEST3.csv', index=False)
 
 
 def main():
@@ -342,27 +350,27 @@ def main():
                '47', '20']
 
     # remove last 6 drivers for better comparison -- fix --
-    drivers = ['11', '55'] #, '1', '16'] #, '63', '4', '14', '44', '77', '5', '10', '31', '3', '18']
+    # drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18']
 
     # drivers = ['VER', 'PER', 'LEC', 'SAI', 'RUS', 'HAM', 'NOR', 'RIC', 'ALO', 'OCO', 'BOT', 'ZHO', 'GAS', 'TSU',
     #            'STR', 'VET', 'MAG', 'MSC', 'ALB', 'LAT']
 
-    #plot_delta(2022, 'Monaco', '16', '55', 2)
+    # plot_delta(2022, 'Monaco', '16', '55', 2)
 
     """graph two drivers time vs distance for a single lap"""
-    #time_dist(2022, 'Monaco', '16', '55', 2)
+    # time_dist(2022, 'Monaco', '16', '55', 2)
 
     """graph all drivers time vs distance for a single lap """
-    #time_dist_all(2022, 'Monaco', drivers, 8)
+    # time_dist_all(2022, 'Monaco', drivers, 8)
 
     """---lap 7 OCO pass VET---
     graph two drivers time vs distance for entire race"""
     # time_dist_race_two(2022, 'Monaco', ['OCO', 'VET'], 10)
 
     """graph all drivers time vs distance for entire race"""
-    #time_dist_race_all(2022, 'Monaco', drivers)
+    # time_dist_race_all(2022, 'Monaco', drivers)
 
-    time_gap_race_all(2022, 'Monaco', drivers, df_path='data/Monaco/MonacoTD_TEST.csv')
+    time_gap_race_all(2022, 'Monaco', drivers) #, num_laps=4) #, df_path='data/Monaco/__TEST__.csv')
 
 
 if __name__ == '__main__':

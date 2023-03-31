@@ -44,3 +44,5 @@ next: plot all drivers for entire race
 *** need to interpolate distances using smallest time intervals ***
 
 scale distances to known lap distance
+
+max distance of every row to create "leader car"
