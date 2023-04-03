@@ -303,7 +303,7 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
         max_time = math.ceil(max(laps_df['Time']).total_seconds())
         #print(max_time)
         laps_df_new = pd.DataFrame()
-        t = np.linspace(0, max_time, math.floor(max_time / 0.4))  # use 0.18s sample rate
+        t = np.linspace(0, max_time, math.floor(max_time / 60))  # use 0.18s sample rate
         laps_df_new['Time'] = t
 
         for d in drivers:

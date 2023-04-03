@@ -26,7 +26,7 @@ def driver_ahead():
     session.load()
 
     DRIVER = 'SAI'  # which driver; need to specify number and abbreviation
-    LAP_N = 35      # which lap number to plot
+    LAP_N = 18      # which lap number to plot
 
     drv_laps = session.laps.pick_driver(DRIVER)
     drv_lap = drv_laps[(drv_laps['LapNumber'] == LAP_N)]  # select the lap
