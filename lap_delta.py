@@ -301,9 +301,9 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
 
         """ *** max time = 0 days 01:58:30.069000 // 7110.069s *** """
         max_time = math.ceil(max(laps_df['Time']).total_seconds())
-        #print(max_time)
+        print(max_time)
         laps_df_new = pd.DataFrame()
-        t = np.linspace(0, max_time, math.floor(max_time / 60))  # use 0.18s sample rate
+        t = np.linspace(0, max_time, math.floor(max_time / 0.25))  # use 0.18s sample rate
         laps_df_new['Time'] = t
 
         for d in drivers:
@@ -329,14 +329,14 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
             ax.plot(df['Time'].apply(lambda row: datetime.timedelta(seconds=row)), df['DistanceGap_' + d],
                     color=plotting.driver_color(d),
                     label=d)
-    df.to_csv('data/Monaco/__GAP__.csv', index=False)
+    df.to_csv('data/Monaco/__GAP1__.csv', index=False)
 
-    ax.set_ylim(bottom= -3337, top=3337)
-    ax.set_xlabel("Time (h:mm)")
+    #ax.set_ylim(bottom= -3337, top=3337)
+    ax.set_xlabel("Time (mm:ss)")
     ax.set_ylabel("Distance Gap (m)")
     ax.legend(loc='lower center',
               ncol=4, fancybox=True, shadow=True)
-    plt.title(race + " " + str(year) + " Time vs Distance Gap to Leader")
+    plt.title(race + " " + str(year) + " Time vs Distance Gap to " + leader)
     plt.show()
 
     #df.to_csv('data/Monaco/MonacoTD_TEST3.csv', index=False)
@@ -370,7 +370,7 @@ def main():
     """graph all drivers time vs distance for entire race"""
     # time_dist_race_all(2022, 'Monaco', drivers)
 
-    time_gap_race_all(2022, 'Monaco', drivers) #, num_laps=4) #, df_path='data/Monaco/__TEST__.csv')
+    time_gap_race_all(2022, 'Monaco', ['16', '55'], num_laps=1) #, num_laps=4) #, df_path='data/Monaco/__TEST__.csv')
 
 
 if __name__ == '__main__':

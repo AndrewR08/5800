@@ -50,6 +50,8 @@ def download_data():
 
 def add_pitstop(df, filename):
     df['PitLap'] = df.loc[~df['PitInTime'].isna(), 'LapNumber']
+
+    df['PitLap'] =
     df.to_csv(filename, index=False)
     return df
 

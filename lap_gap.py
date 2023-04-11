@@ -99,9 +99,9 @@ def main():
     drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18', '6', '24', '22',
                '23', '47', '20']
 
-    #time_gap_race_all(2022, 'Monaco', drivers)
+    time_gap_race_all(2022, 'Monaco', drivers)
 
-    driver_ahead_test(2022, 'Monaco', ['NOR'])
+    #driver_ahead_test(2022, 'Monaco', ['NOR'])
 
 
 if __name__ == '__main__':
