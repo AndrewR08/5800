@@ -1,0 +1,10 @@
+[512 LSTM],mean_squared_error,16,30,30,31.061094284057617
+[512 LSTM],mean_squared_error,16,30,30,22.2601261138916
+[512 Dense],mean_squared_error,16,30,30,86.94798278808594
+[512 Dense],mean_squared_error,16,30,30,105.6009750366211
+[512 Dense|512 Dense],mean_squared_error,16,30,30,144.02590942382812
+[512 Dense|512 Dense],mean_squared_error,16,30,30,99.41639709472656
+[512 Dense|512 Dense],mean_squared_error,16,30,30,92.72140502929688
+[512 Dense|512 Dense],mean_squared_error,16,30,30,68.50532531738281
+[512 Dense],mean_squared_error,16,30,30,138.19146728515625
+[512 Dense],mean_squared_error,16,30,30,147.80462646484375
