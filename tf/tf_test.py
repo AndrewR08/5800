@@ -11,7 +11,7 @@ from sklearn.metrics import mean_squared_error
 np.random.seed(8)
 tf.random.set_seed(8)
 
-df = pd.read_csv('data/Monaco/__GAP1__.csv')
+df = pd.read_csv('tf/data/__GAP1__.csv')
 df = df.tail(-1)
 df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)
 
@@ -34,7 +34,7 @@ time_steps = 10
 X_train, y_train = create_dataset(train, train.DistanceGap_SAI, time_steps)
 X_test, y_test = create_dataset(test, test.DistanceGap_SAI, time_steps)
 
-num_units = 64
+num_units = 128
 
 model = Sequential()
 model.add(Input(shape=(X_train.shape[1], X_train.shape[2]), name='input'))
@@ -57,9 +57,11 @@ plt.plot(history.history['val_loss'], label='test')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend()
+plt.savefig('tf/images/Epoch_Loss.png')
 
 y_pred = model.predict(X_test, verbose=0)
 
+plt.clf()
 plt.plot(np.arange(0, len(y_train)), y_train, 'g', label="history")
 plt.plot(np.arange(len(y_train), len(y_train) + len(y_test)), y_test, label="true")
 plt.plot(np.arange(len(y_train), len(y_train) + len(y_test)), y_pred, 'r', label="prediction")
@@ -67,12 +69,13 @@ plt.ylabel('Value')
 plt.xlabel('Time Step')
 plt.title('Distannce Gap SAI - LSTM (' + str(num_units) + ' units)')
 plt.legend()
-plt.show()
+plt.savefig('tf/images/Distance_Gap.png')
 
+plt.clf()
 plt.plot(y_test, label="true")
 plt.plot(y_pred, 'r', label="prediction")
 plt.ylabel('Value')
 plt.xlabel('Time Step')
 plt.title('Zoomed Distannce Gap SAI - LSTM (' + str(num_units) + ' units)')
 plt.legend()
-plt.show()
+plt.savefig('tf/images/Zoomed_Distance_Gap.png')
