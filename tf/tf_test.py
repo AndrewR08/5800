@@ -23,7 +23,7 @@ def main():
 
     df = pd.read_csv('data/__GAP1__.csv')
     df = df.tail(-1)
-    df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)
+    df = df.drop(['Distance_LEC', 'DistanceGap_SAI'], axis=1)
 
     """best_model = keras.models.load_model(f"best_models/gap1all.h5", compile=True,
                                               custom_objects={'Normalization': Normalization})
@@ -33,36 +33,38 @@ def main():
     train, test = df.iloc[0:train_size], df.iloc[train_size:len(df)]
 
     time_steps = 10
-    X_train, y_train = create_dataset(train, train.DistanceGap_SAI, time_steps)
-    X_test, y_test = create_dataset(test, test.DistanceGap_SAI, time_steps)
+    X_train, y_train = create_dataset(train, train.Distance_SAI, time_steps)
+    X_test, y_test = create_dataset(test, test.Distance_SAI, time_steps)
+
+    keras.backend.clear_session()
 
     model = Sequential()
     model.add(Input(shape=(X_train.shape[1], X_train.shape[2]), name='input'))
-    model.add(LSTM(units=512, return_sequences=True))
-    model.add(LSTM(units=128, return_sequences=True))
-    model.add(LSTM(units=512))
+    model.add(LSTM(units=512, return_sequences=True, activation='relu'))
+    model.add(LSTM(units=128, return_sequences=True, activation='relu'))
+    model.add(LSTM(units=512, activation='relu'))
 
-    model.add(Dense(units=1))
+    model.add(Dense(units=1, activation='relu'))
     model.compile(
       loss='mean_squared_error',
       optimizer='adam')
 
     history = model.fit(
         X_train, y_train,
-        epochs=50,
+        epochs=25,
         batch_size=32,
         validation_split=0.1,
         verbose=1,
         shuffle=False)
 
-    plt.plot(history.history['loss'], label='train')
+    """plt.plot(history.history['loss'], label='train')
     plt.plot(history.history['val_loss'], label='test')
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend()
-    plt.savefig('images/Epoch_Loss.png')
+    plt.savefig('images/Epoch_Loss.png')"""
 
-    y_pred = model.predict(X_test, verbose=0)
+    y_pred = model.predict(X_test, verbose=1)
 
     plt.clf()
     plt.plot(np.arange(0, len(y_train)), y_train, 'g', label="history")
@@ -70,18 +72,18 @@ def main():
     plt.plot(np.arange(len(y_train), len(y_train) + len(y_test)), y_pred, 'r', label="prediction")
     plt.ylabel('Value')
     plt.xlabel('Time Step')
-    plt.title('Distannce Gap - LSTM')
+    plt.title('Distance - LSTM')
     plt.legend()
-    plt.savefig('images/Distance_Gap1.png')
+    plt.savefig('images/Distance.png')
 
     plt.clf()
     plt.plot(y_test, label="true")
     plt.plot(y_pred, 'r', label="prediction")
     plt.ylabel('Value')
     plt.xlabel('Time Step')
-    plt.title('Zoomed Distannce Gap SAI - LSTM')
+    plt.title('Zoomed Distance SAI - LSTM')
     plt.legend()
-    plt.savefig('images/Zoomed_Distance_Gap1.png')
+    plt.savefig('images/Zoomed_Distance.png')
 
 
 if __name__ == '__main__':
