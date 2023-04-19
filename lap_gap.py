@@ -79,7 +79,7 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
                     d_lap = d_laps[d_laps['LapNumber'] == j].iloc[0]
 
                 ref = d_lap.get_car_data(interpolate_edges=True)
-                ref.add_driver_ahead()
+                ref.add_distance()
                 ref['LapNumber'] = d_lap.LapNumber
                 ref['Driver'] = d_laps.Driver.iloc[0]
                 ref['DriverNumber'] = d_laps.DriverNumber.iloc[0]
@@ -89,17 +89,17 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
 
                 laps_df = pd.concat([laps_df, ref]).reset_index(drop=True)
 
-            laps_df.to_csv('data/Monaco/Driver_Ahead.csv', index=False)
+            laps_df.to_csv('tf/data/__GAP2D__.csv', index=False)
 
 
 def main():
-    cache(False)
+    cache(True)
 
     """array containing all drivers numbers for 2022 season"""
     drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18', '6', '24', '22',
                '23', '47', '20']
 
-    time_gap_race_all(2022, 'Monaco', drivers)
+    time_gap_race_all(2022, 'Monaco', ['LEC', 'SAI', 'VER'])
 
     #driver_ahead_test(2022, 'Monaco', ['NOR'])
 

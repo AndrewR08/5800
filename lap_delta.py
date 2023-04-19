@@ -25,6 +25,17 @@ def cache(pc):
         ff1.Cache.enable_cache('/Users/andrewreeves/Documents/ASU/fastf1')
 
 
+def remove_outliers(df, columns, n_std):
+    for col in columns:
+        print('Working on column: {}'.format(col))
+
+        mean = df[col].mean()
+        sd = df[col].std()
+        df = df[(df[col] <= mean + (n_std * sd))]
+
+    return df
+
+
 def plot_delta(year, race, d1, d2, lap_num=8):
     plotting.setup_mpl()
 
@@ -301,7 +312,7 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
 
         """ *** max time = 0 days 01:58:30.069000 // 7110.069s *** """
         max_time = math.ceil(max(laps_df['Time']).total_seconds())
-        print(max_time)
+        print("max time, ", max_time)
         laps_df_new = pd.DataFrame()
         t = np.linspace(0, max_time, math.floor(max_time / 0.25))  # use 0.18s sample rate
         laps_df_new['Time'] = t
@@ -313,23 +324,30 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
             laps_df_new['Distance_' + str(laps_df.Driver.loc[laps_df.DriverNumber == d].iloc[0])] = d_new
 
         df = laps_df_new
+        df.to_csv('data/Monaco/MonacoTD_lapsdf_TEST3.csv', index=False)
 
     else:
         df = pd.read_csv(df_path)
 
     # df['Time'] = df['Time'].apply(lambda row: datetime.timedelta(seconds=row))
     leader = str(df.columns[1])[9:]
-    #print(leader)
+    print("leader, ", leader)
     for i in range(len(drivers)):
         d = str(df.columns[i + 1])[9:]
+        print(d)
         if d != leader:
             df['DistanceGap_' + d] = df['Distance_' + leader] - df['Distance_' + d]
             # df['DistanceGap_'+d] = df['DistanceGap_'+d].loc[df['DistanceGap_'+d] > 3337].apply(lambda row: 0)
             #df = df[(np.abs(stats.zscore(df)) < 2).all(axis=1)]
+            df = remove_outliers(df, ['DistanceGap_' + d], n_std=4)
+
             ax.plot(df['Time'].apply(lambda row: datetime.timedelta(seconds=row)), df['DistanceGap_' + d],
                     color=plotting.driver_color(d),
                     label=d)
-    df.to_csv('data/Monaco/__GAP1__.csv', index=False)
+
+    df.drop(columns=df.columns[1:(len(drivers)+1)], inplace=True)
+
+    df.to_csv('tf/data/__GAP1R__.csv', index=False)
 
     #ax.set_ylim(bottom= -3337, top=3337)
     ax.set_xlabel("Time (mm:ss)")
@@ -339,11 +357,9 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
     plt.title(race + " " + str(year) + " Time vs Distance Gap to " + leader)
     plt.show()
 
-    #df.to_csv('data/Monaco/MonacoTD_TEST3.csv', index=False)
-
 
 def main():
-    cache(False)
+    cache(True)
 
     """array containing all drivers numbers for 2022 season"""
     drivers = ['11', '55', '1', '16', '63', '4', '14', '44', '77', '5', '10', '31', '3', '18', '6', '24', '22', '23',
@@ -370,7 +386,7 @@ def main():
     """graph all drivers time vs distance for entire race"""
     # time_dist_race_all(2022, 'Monaco', drivers)
 
-    time_gap_race_all(2022, 'Monaco', ['16', '55'], num_laps=1) #, num_laps=4) #, df_path='data/Monaco/__TEST__.csv')
+    time_gap_race_all(2022, 'Monaco', ['16', '55']) #, num_laps=4) #, df_path='data/Monaco/__TEST__.csv')
 
 
 if __name__ == '__main__':

@@ -46,3 +46,7 @@ next: plot all drivers for entire race
 scale distances to known lap distance
 
 max distance of every row to create "leader car"
+
+- presentation 20 minutes plus 10 questions
+    - May 4
+- tech report due week after presentation

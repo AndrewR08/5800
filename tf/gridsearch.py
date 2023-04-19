@@ -19,8 +19,8 @@ tf.random.set_seed(8)
 
 # Constants - (ACCEPTABLE ERROR)
 optimizer = 'adam'
-batch_size = 16
-epochs = 30
+batch_size = 32
+epochs = 200
 
 # Debug settings
 PRINT_PERMUTATIONS = True  # Whether to print the amount of permutations while running
@@ -63,7 +63,6 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
     # Sequential Model
     model = Sequential()
     model.add(Input(shape=(X_train.shape[1], X_train.shape[2]), name='input'))
-    model.add(LSTM(units=256))
 
     # Hidden Layers
     for layer in layers:
@@ -82,14 +81,14 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
                         batch_size=batch_size,
                         epochs=epochs,
                         verbose=1,
-                        validation_data=[X_test, y_test],
+                        validation_split=0.1,
                         callbacks=[model_checkpoint, early_stopping])
     number_of_epochs_ran = len(history.history['val_loss'])
     val_loss = model.evaluate(X_test, y_test, verbose=0)
 
     # Write result to results
     csv_result = f"{layers_str},{loss_function_name},{batch_size},{epochs},{number_of_epochs_ran},{val_loss}\n"
-    file1 = open('results.csv', 'a+')
+    file1 = open('results_halflap.csv', 'a+')
     file1.write(csv_result)
     file1.close()
     print("Results appended.\n")
@@ -100,13 +99,13 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
 
     # Check if the current model is better or not
     prev_best_val_loss = float('inf')
-    if exists(f"best_models/gap1.h5"):
-        prev_best_model = keras.models.load_model(f"best_models/gap1.h5", compile=True,
+    if exists(f"best_models/gap1all.h5"):
+        prev_best_model = keras.models.load_model(f"best_models/gap1all.h5", compile=True,
                                                   custom_objects={'Normalization': Normalization})
         prev_best_val_loss = prev_best_model.evaluate(X_test, y_test, verbose=0)
     if prev_best_val_loss - best_loss > 0.000001:
-        print(f"NEW RECORD! Loss: {best_loss}, saved to: best_models/gap1.h5")
-        model.save(f"best_models/gap1.h5")
+        print(f"NEW RECORD! Loss: {best_loss}, saved to: best_models/gap1all.h5")
+        model.save(f"best_models/gap1all.h5")
     else:
         print(f"This run did not beat the previous best loss of {prev_best_val_loss}")
 
@@ -125,16 +124,14 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
 
 
 # Run grid search
-def grid_search(train, test, layer_types, layer_counts, neuron_counts, loss_functions):
+def grid_search(train, test, layer_counts, neuron_counts, loss_functions):
     if PRINT_PERMUTATIONS:
         amt_loss_functions = len(loss_functions)
-        amt_layer_types = len(layer_types)
         amt_neuron_counts = len(neuron_counts)
         amt_total = 0
         for layer_count in layer_counts:
             amt_neuron_total = amt_neuron_counts ** layer_count
-            amt_activation_total = amt_layer_types ** layer_count
-            amt_total += (amt_neuron_total * amt_activation_total)
+            amt_total += (amt_neuron_total)
         amt_total *= amt_loss_functions
         print(f"Total permutations: {amt_total}")
 
@@ -143,15 +140,14 @@ def grid_search(train, test, layer_types, layer_counts, neuron_counts, loss_func
     for loss_function in loss_functions:
         for layer_count in layer_counts:
             neuron_count_permutations = list(itertools.product(neuron_counts, repeat=layer_count))
-            neuron_activation_permutations = list(itertools.product(layer_types, repeat=layer_count))
-            perms = list(itertools.product(neuron_count_permutations, neuron_activation_permutations))
-            for layer_neuron_counts, activations in perms:
+
+            perms = list(neuron_count_permutations)
+            for layer_neuron_counts in perms:
                 layers = []
                 for i in range(len(layer_neuron_counts)):
                     neuron_amt = layer_neuron_counts[i]
-                    activation = activations[i]
                     layer_name = "layer" + str(len(layers))
-                    layers.append(Dense(neuron_amt, activation=activation, name=layer_name))
+                    layers.append(LSTM(units=neuron_amt, return_sequences=True, name=layer_name))
                 layer_permutations.append(layers)
     amt_layer_permutations = len(layer_permutations)
     print(f"All {amt_layer_permutations} permutations compiled.")
@@ -169,21 +165,17 @@ def grid_search(train, test, layer_types, layer_counts, neuron_counts, loss_func
 def main():
     df = pd.read_csv('data/__GAP1__.csv')
     df = df.tail(-1)
-    df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)
+    df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)      #not needed for gap1r
 
     train_size = int(len(df) * 0.5)
-    test_size = len(df) - train_size
     train, test = df.iloc[0:train_size], df.iloc[train_size:len(df)]
 
-
-
     # Hyperparameters for Grid Search
-    layer_types = ['relu', 'sigmoid']
-    layer_counts = [1, 2]
-    neuron_counts = [512]
+    layer_counts = [1, 2, 3, 4]
+    neuron_counts = [128, 256, 512]
     loss_functions = [MeanSquaredError()]
 
-    grid_search(train, test, layer_types, layer_counts, neuron_counts, loss_functions)
+    grid_search(train, test, layer_counts, neuron_counts, loss_functions)
 
 
 if __name__ == '__main__':
