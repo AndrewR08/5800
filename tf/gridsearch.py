@@ -88,7 +88,7 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
 
     # Write result to results
     csv_result = f"{layers_str},{loss_function_name},{batch_size},{epochs},{number_of_epochs_ran},{val_loss}\n"
-    file1 = open('results_halflap.csv', 'a+')
+    file1 = open('results_race.csv', 'a+')
     file1.write(csv_result)
     file1.close()
     print("Results appended.\n")
@@ -100,12 +100,12 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
     # Check if the current model is better or not
     prev_best_val_loss = float('inf')
     if exists(f"best_models/gap1all.h5"):
-        prev_best_model = keras.models.load_model(f"best_models/gap1all.h5", compile=True,
+        prev_best_model = keras.models.load_model(f"best_models/gap1race.h5", compile=True,
                                                   custom_objects={'Normalization': Normalization})
         prev_best_val_loss = prev_best_model.evaluate(X_test, y_test, verbose=0)
     if prev_best_val_loss - best_loss > 0.000001:
-        print(f"NEW RECORD! Loss: {best_loss}, saved to: best_models/gap1all.h5")
-        model.save(f"best_models/gap1all.h5")
+        print(f"NEW RECORD! Loss: {best_loss}, saved to: best_models/gap1race.h5")
+        model.save(f"best_models/gap1race.h5")
     else:
         print(f"This run did not beat the previous best loss of {prev_best_val_loss}")
 
@@ -163,7 +163,7 @@ def grid_search(train, test, layer_counts, neuron_counts, loss_functions):
 
 
 def main():
-    df = pd.read_csv('data/__GAP1__.csv')
+    df = pd.read_csv('data/__GAP1R__.csv')
     df = df.tail(-1)
     df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)      #not needed for gap1r
 

@@ -345,7 +345,7 @@ def time_gap_race_all(year, race, drivers, num_laps=None, df_path=None):
                     color=plotting.driver_color(d),
                     label=d)
 
-    df.drop(columns=df.columns[1:(len(drivers)+1)], inplace=True)
+    #df.drop(columns=df.columns[1:(len(drivers)+1)], inplace=True)
 
     df.to_csv('tf/data/__GAP1R__.csv', index=False)
 
