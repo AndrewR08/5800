@@ -88,7 +88,7 @@ def run(train, test, layers, loss_function, optimizer, batch_size, epochs, save,
 
     # Write result to results
     csv_result = f"{layers_str},{loss_function_name},{batch_size},{epochs},{number_of_epochs_ran},{val_loss}\n"
-    file1 = open('results_race1.csv', 'a+')
+    file1 = open('results/results_race1.csv', 'a+')
     file1.write(csv_result)
     file1.close()
     print("Results appended.\n")

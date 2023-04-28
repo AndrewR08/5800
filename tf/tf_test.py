@@ -21,7 +21,7 @@ def main():
     np.random.seed(8)
     tf.random.set_seed(8)
 
-    df = pd.read_csv('data/__GAP1R__.csv')
+    df = pd.read_csv('data/__GAP1__.csv')
     df = df.tail(-1)
     df = df.drop(['Distance_LEC', 'Distance_SAI'], axis=1)
 
@@ -31,6 +31,7 @@ def main():
 
     train_size = int(len(df) * 0.8)
     train, test = df.iloc[0:train_size], df.iloc[train_size:len(df)]
+    print(train)
 
     time_steps = 10
     X_train, y_train = create_dataset(train, train.DistanceGap_SAI, time_steps)
