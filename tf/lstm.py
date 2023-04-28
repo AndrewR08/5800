@@ -46,7 +46,7 @@ def main():
     keras.backend.clear_session()
 
     model = Sequential()
-    model.add(LSTM(units=32, input_shape=(lookback, 1)))
+    model.add(LSTM(units=64, input_shape=(lookback, 1)))
     model.add(Dense(units=1))
     model.compile(
         loss='mean_squared_error',
