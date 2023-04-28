@@ -5,6 +5,7 @@ import tensorflow as tf
 import keras
 from keras.models import Sequential
 from keras.layers import *
+from keras.callbacks import EarlyStopping
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -17,7 +18,7 @@ def main():
 
     df = pd.read_csv('data/__GAP1__.csv')
     df = df.tail(-1)
-    df = df.drop(['Time', 'Distance_LEC', 'Distance_SAI'], axis=1)
+    df = df.drop(['Time', 'Distance_LEC', 'DistanceGap_SAI'], axis=1)
 
     X = df.values
     print(X.shape)
@@ -43,10 +44,14 @@ def main():
         X_test, y_test = create_dataset(test, test.DistanceGap_SAI, time_steps)
         """
 
+    patience = 20
+    early_stopping = EarlyStopping(monitor='loss', patience=patience, verbose=1)
+
     keras.backend.clear_session()
 
     model = Sequential()
-    model.add(LSTM(units=64, input_shape=(lookback, 1)))
+    model.add(LSTM(units=4, input_shape=(lookback, 1), activation='relu', return_sequences=True))
+    model.add(LSTM(units=2, activation='relu'))
     model.add(Dense(units=1))
     model.compile(
         loss='mean_squared_error',
@@ -54,10 +59,10 @@ def main():
 
     history = model.fit(
         X_train, y_train,
-        epochs=100,
+        epochs=1000,
         batch_size=32,
-        verbose=1,)
-        #shuffle=False)
+        verbose=1,
+        callbacks=[early_stopping])
 
     n_predictions = 10
 
@@ -94,9 +99,9 @@ def main():
     plt.plot(predictions, 'r', label="prediction")
     plt.ylabel('Value')
     plt.xlabel('Time Step')
-    plt.title('Zoomed Distance Gap SAI - LSTM')
+    plt.title('Zoomed Distance SAI - LSTM')
     plt.legend()
-    plt.savefig('images/Zoomed_DistanceGapL1.png')
+    plt.savefig('images/Zoomed_DistanceL1.png')
     plt.show()
 
 
