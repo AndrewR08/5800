@@ -3,53 +3,44 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
-# Prepare the data
-# Suppose we have a time-series data 'X' with 100 time steps and one feature per time step
-X = np.random.randn(100, 1)
-print(X.shape)
-print()
-
-# Define the number of time steps to look back for making the predictions
+# Generate some toy data
+n_samples = 100
 n_lookback = 5
+n_features = 2
+X = np.random.randn(n_samples, n_lookback, n_features)
+print(X.shape)
+y1 = np.random.randn(n_samples, 1)
+y2 = np.random.randn(n_samples, 1)
+y3 = np.random.randn(n_samples, 1)
+y = np.hstack((y1, y2, y3))
 
-# Create the input data in the appropriate format for LSTM
-X_train = []
-y_train = []
-for i in range(n_lookback, len(X)):
-    X_train.append(X[i-n_lookback:i])
-    y_train.append(X[i])
-X_train, y_train = np.array(X_train), np.array(y_train)
-print(X_train)
-print()
-print(y_train)
+# Split the data into training and test sets
+n_train = int(0.8 * n_samples)
+X_train, X_test = X[:n_train], X[n_train:]
+y_train, y_test = y[:n_train], y[n_train:]
 
-# Define the LSTM model
+# Build the model
 model = Sequential()
-model.add(LSTM(units=50, return_sequences=True, input_shape=(n_lookback, 1)))
-model.add(LSTM(units=50))
-model.add(Dense(units=1))
-
-# Compile the model
-model.compile(optimizer='adam', loss='mean_squared_error')
+model.add(LSTM(32, input_shape=(n_lookback, n_features)))
+model.add(Dense(3))
+model.compile(optimizer='adam', loss='mse')
 
 # Train the model
-model.fit(X_train, y_train, epochs=50, batch_size=32)
+model.fit(X_train, y_train, epochs=50, batch_size=16, verbose=0)
 
 # Use the model for predictions
 # Suppose we want to predict the next 10 time steps
 n_predictions = 10
 
 # Create the input data for prediction
-X_test = X[-n_lookback:].reshape(1, n_lookback, 1)
-print(X_test)
+X_test_input = X[-n_lookback:].reshape(1, n_lookback, n_features)
 
 # Make the predictions
 predictions = []
 for i in range(n_predictions):
-    prediction = model.predict(X_test)[0][0]
-    #print(prediction)
+    prediction = model.predict(X_test_input)[0]
     predictions.append(prediction)
-    X_test = np.append(X_test[:, 1:, :], [[[prediction]]], axis=1)
+    X_test_input = np.append(X_test_input[:, 1:, :], [[prediction]], axis=1)
 
 # Print the predictions
 print(predictions)
