@@ -32,7 +32,6 @@ def remove_outliers(df, columns, n_std):
         mean = df[col].mean()
         sd = df[col].std()
         df = df[(df[col] <= mean + (n_std * sd))]
-
     return df
 
 

@@ -1,5 +1,3 @@
-import math
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,9 +7,9 @@ from keras.models import Sequential
 from keras.layers import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import load_model
+import os
 from os.path import exists
 
-import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 
