@@ -80,7 +80,7 @@ def main():
 
     # Set model parameters for predicting with model
     model_path = 'models/' + model_name + '.h5'
-    n_predictions = 15      # 15 ~= 3.75s of data
+    n_predictions = 15      # 15 ~= 3.75s of data (300 ~= 1 lap)
     n_predictions = int(train_size*len(X_train))
     print(n_predictions)
 
@@ -94,9 +94,8 @@ def main():
     filename = 'test_img.png'
     plot_pred(predictions, actual, filename, ds)
 
-# **** calculate n_predictions(based on num laps/avg laptime)?, update train csv to be entire race but only use first
-#       so many laps to train and rest are available to compare predictions with, save datframes, models, etc based on
-#       input (ex. British GP, SAI/LEC = 'British_Grand_Prix_55_16'
+# ****  - update train csv to be entire race but only use first laps to train and rest to compare predictions with
+#       - save dataframes, models, etc based on input (ex. British GP, SAI/LEC = 'British_Grand_Prix_55_16'
 
 
 if __name__ == '__main__':
