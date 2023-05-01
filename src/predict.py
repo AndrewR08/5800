@@ -20,14 +20,18 @@ def load(file_path):
 # function to predict using loaded model and data from quali lap
 # - model_path: path to model in which to load
 # - n_predictions: number of predictions to make (1 = 0.25s)
-# - quali_df: qualifying data to be used as history for model predictions
+# - df: data to be used as history for model predictions
 # - lookback: amount of data to use as history for model
 # - n_features: number of features for output size
-def predict(model_path, n_predictions, df, lookback, n_features):
+# - train_size: amount of data withheld for training, use rest for testing
+def predict(model_path, n_predictions, df, lookback, X_train):
     model = load(model_path)
 
+    df = df.drop(['Time'], axis=1)
     X = df.values
-    X_test = X.reshape(1, lookback, n_features)
+    n_features = len(X_train[0][0])
+    test_start = (len(X_train) * 2) - 1
+    X_test = X[test_start:test_start+lookback].reshape(1, lookback, n_features)
 
     predictions = []
     for i in range(n_predictions):
@@ -38,23 +42,30 @@ def predict(model_path, n_predictions, df, lookback, n_features):
     # Flatten predictions list
     predictions = [element for sublist in predictions for element in sublist]
 
+    print(test_start, n_predictions)
+    actual = X[test_start:test_start+n_predictions]
+
+    return predictions, actual
+
 
 # function to plot prediction values
 # - predictions: array of predicted values from predict() function
+# - actual: array of actual values in data from predict() function
 # - filename: filename to save plot image
-def plot_pred(predictions, filename):
+# - ds: list of driver identifiers
+def plot_pred(predictions, actual, filename, ds):
+    d1_true = []
     d1_pred = []
-    d2_pred = []
     for i in range(len(predictions)):
-        d1_pred.append(predictions[i][0])
-        d2_pred.append(predictions[i][1])
-    plt.plot(d1_pred, label="d1 - prediction")
-    plt.plot(d2_pred, label="d2 - prediction")
+        #d1_true.append(actual[i])
+        d1_pred.append(predictions[i])
+    #plt.plot(d1_true, label=ds[0] + " - true")
+    plt.plot(d1_pred, label=ds[0] + " - prediction")
     plt.ylabel('Distance Gap')
     plt.xlabel('Time Step')
-    plt.title('Zoomed Distance Gap Prediction - LSTM')
+    plt.title('Zoomed Distance Gap Prediction ' + ds[0] + "/" + ds[1])
     plt.legend()
-    plt.savefig('images/'+filename)
+    #plt.savefig('images/'+filename)
     plt.show()
 
 

@@ -26,6 +26,10 @@ race_dict = {'Abu_Dhabi_Grand_Prix': 1, 'Australian_Grand_Prix': 2,
              'Sao_Paulo_Grand_Prix': 18, 'Saudi_Arabian_Grand_Prix': 19, 'Singapore_Grand_Prix': 20,
              'Spanish_Grand_Prix': 21, 'United_States_Grand_Prix': 22}
 
+drivers_dict = {1: 'VER', 3: 'RIC', 4: 'NOR', 5: 'VET', 6: 'LAT', 10: 'GAS', 11: 'PER', 14: 'ALO', 16: 'LEC', 18: 'STR',
+                20: 'MAG', 22: 'TSU', 23: 'ALB', 24: 'ZHO', 31: 'OCO', 44: 'HAM', 47: 'MSC', 55: 'SAI', 63: 'RUS',
+                77: 'BOT'}
+
 
 # function to determine cache location of fastf1 data
 # - pc: True = Desktop, False = Mac
@@ -66,7 +70,7 @@ def time_gap_race(year, track, drivers, fn, num_laps=None):
 
     # race distance variable
     race_dist = lap_dict[track]
-    print(race_dist)
+    # print(race_dist)
 
     laps_df = pd.DataFrame()
 
@@ -77,7 +81,7 @@ def time_gap_race(year, track, drivers, fn, num_laps=None):
         d = drivers[i]
         d_laps = session.laps.pick_driver(d)
         if num_laps is None:
-            laps = max(d_laps.LapNumber)
+            laps = int(max(d_laps.LapNumber))
         else:
             laps = num_laps
 
@@ -138,15 +142,3 @@ def time_gap_race(year, track, drivers, fn, num_laps=None):
     df.drop(columns=df.columns[1:(len(drivers) + 1)], inplace=True)
 
     df.to_csv('data/' + fn, index=False)
-
-
-def time_gap_quali(year, track, drivers):
-    # cache(True)
-
-    # race distance variable
-    race_dist = 3337
-
-    laps_df = pd.DataFrame()
-
-    session = ff1.get_session(year, track, 'R')
-    session.load()

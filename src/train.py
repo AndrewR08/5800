@@ -5,6 +5,7 @@ from keras.models import Sequential
 from keras.layers import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import os
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # fix random seed for reproducibility
@@ -22,7 +23,7 @@ def create_seq(X, lookback, train_size):
     ys = []
 
     # append x, y data to lists from X based on lookback
-    for i in range(lookback, int(train_size*len(X))):
+    for i in range(lookback, int(train_size * len(X))):
         Xs.append(X[i - lookback:i])
         ys.append(X[i])
     return np.array(Xs), np.array(ys)
@@ -30,16 +31,13 @@ def create_seq(X, lookback, train_size):
 
 # function to train lstm model on given dataframe, input df & track infor
 # - track info: track name, year, num_laps
-def train(df, model_name, train_size, verbose):
+def train(df, model_name, train_size, lookback, verbose):
     # drop unnecessary time column
     df = df.drop(['Time'], axis=1)
 
     # create array of df values
     X = df.values
     print(np.shape(X))
-
-    # define lookback (1 = 0.25s)
-    lookback = 20 # 150=~40s of data / half lap
 
     # create training data using create_seq function
     X_train, y_train = create_seq(X, lookback, train_size)
@@ -61,10 +59,10 @@ def train(df, model_name, train_size, verbose):
 
     # define sequential model with 1 LSTM layer and Dense output layer
     model = Sequential()
-    model.add(LSTM(units=64, input_shape=(lookback, num_features))) #, return_sequences=True))
+    model.add(LSTM(units=128, input_shape=(lookback, num_features)))  # , return_sequences=True))
     # add dropout to reduce overfitting
-    model.add(Dropout(0.2))
-    #model.add(LSTM(units=32))
+    model.add(Dropout(0.4))
+    # model.add(LSTM(units=32))
     model.add(Dense(units=num_features, activation='linear'))
 
     # compile model using mse as loss function and rmsprop as optimizer (better than adam for lstm)
@@ -83,3 +81,4 @@ def train(df, model_name, train_size, verbose):
         callbacks=[early_stopping, model_checkpoint])
 
     # no need to return model, as best model will be saved as filename from model checkpoint
+    return X_train
