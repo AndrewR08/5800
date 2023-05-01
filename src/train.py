@@ -16,13 +16,13 @@ tf.random.set_seed(8)
 # - X: input data
 # - lookback: amount of data to use as history for model
 # - returns: array of input data, array of output data
-def create_seq(X, lookback):
+def create_seq(X, lookback, train_size):
     # create empty lists to append data
     Xs = []
     ys = []
 
     # append x, y data to lists from X based on lookback
-    for i in range(lookback, len(X)):
+    for i in range(lookback, int(train_size*len(X))):
         Xs.append(X[i - lookback:i])
         ys.append(X[i])
     return np.array(Xs), np.array(ys)
@@ -30,26 +30,27 @@ def create_seq(X, lookback):
 
 # function to train lstm model on given dataframe, input df & track infor
 # - track info: track name, year, num_laps
-def train(df, model_name):
+def train(df, model_name, train_size, verbose):
     # drop unnecessary time column
     df = df.drop(['Time'], axis=1)
 
     # create array of df values
     X = df.values
+    print(np.shape(X))
 
     # define lookback (1 = 0.25s)
-    lookback = 150  # ~40s of data / half lap
+    lookback = 20 # 150=~40s of data / half lap
 
     # create training data using create_seq function
-    X_train, y_train = create_seq(X, lookback)
+    X_train, y_train = create_seq(X, lookback, train_size)
     print(X_train.shape)
-    #print(X_train)
+    print(y_train.shape)
 
     # get number of features for output size
     num_features = len(X_train[0][0])
 
     # define patience used for early stopping and initialize early stopping / best model saving
-    patience = 20
+    patience = 15
     early_stopping = EarlyStopping(monitor='loss', patience=patience, verbose=1)
     # *** use track name as model filename ***
     model_checkpoint = ModelCheckpoint('models/' + model_name + '.h5', monitor='loss', mode='min', verbose=1,
@@ -60,10 +61,10 @@ def train(df, model_name):
 
     # define sequential model with 1 LSTM layer and Dense output layer
     model = Sequential()
-    model.add(LSTM(units=64, input_shape=(lookback, num_features), return_sequences=True))
+    model.add(LSTM(units=64, input_shape=(lookback, num_features))) #, return_sequences=True))
     # add dropout to reduce overfitting
-    model.add(Dropout(0.5))
-    model.add(LSTM(units=32))
+    model.add(Dropout(0.2))
+    #model.add(LSTM(units=32))
     model.add(Dense(units=num_features, activation='linear'))
 
     # compile model using mse as loss function and rmsprop as optimizer (better than adam for lstm)
@@ -78,7 +79,7 @@ def train(df, model_name):
         X_train, y_train,
         epochs=1000,
         batch_size=32,
-        verbose=1,
+        verbose=verbose,
         callbacks=[early_stopping, model_checkpoint])
 
     # no need to return model, as best model will be saved as filename from model checkpoint

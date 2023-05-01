@@ -23,10 +23,10 @@ def load(file_path):
 # - quali_df: qualifying data to be used as history for model predictions
 # - lookback: amount of data to use as history for model
 # - n_features: number of features for output size
-def predict(model_path, n_predictions, quali_df, lookback, n_features):
+def predict(model_path, n_predictions, df, lookback, n_features):
     model = load(model_path)
 
-    X = quali_df.values
+    X = df.values
     X_test = X.reshape(1, lookback, n_features)
 
     predictions = []
