@@ -17,14 +17,14 @@ lap_dict = {'Abu_Dhabi_Grand_Prix': 5554, 'Australian_Grand_Prix': 5303,
             'Sao_Paulo_Grand_Prix': 4309, 'Saudi_Arabian_Grand_Prix': 6175, 'Singapore_Grand_Prix': 5063,
             'Spanish_Grand_Prix': 4655, 'United_States_Grand_Prix': 5513}
 
-track_dict = {'Abu_Dhabi_Grand_Prix': 1, 'Australian_Grand_Prix': 2,
-              'Austrian_Grand_Prix': 3, 'Azerbaijan_Grand_Prix': 4, 'Bahrain_Grand_Prix': 5, 'Belgian_Grand_Prix': 6,
-              'British_Grand_Prix': 7, 'Canadian_Grand_Prix': 8,
-              'Dutch_Grand_Prix': 9, 'Emilia_Romagna_Grand_Prix': 10, 'French_Grand_Prix': 11,
-              'Hungarian_Grand_Prix': 12, 'Italian_Grand_Prix': 13, 'Japanese_Grand_Prix': 14,
-              'Mexico_City_Grand_Prix': 15, 'Miami_Grand_Prix': 16, 'Monaco_Grand_Prix': 17,
-              'Sao_Paulo_Grand_Prix': 18, 'Saudi_Arabian_Grand_Prix': 19, 'Singapore_Grand_Prix': 20,
-              'Spanish_Grand_Prix': 21, 'United_States_Grand_Prix': 22}
+race_dict = {'Abu_Dhabi_Grand_Prix': 1, 'Australian_Grand_Prix': 2,
+             'Austrian_Grand_Prix': 3, 'Azerbaijan_Grand_Prix': 4, 'Bahrain_Grand_Prix': 5, 'Belgian_Grand_Prix': 6,
+             'British_Grand_Prix': 7, 'Canadian_Grand_Prix': 8,
+             'Dutch_Grand_Prix': 9, 'Emilia_Romagna_Grand_Prix': 10, 'French_Grand_Prix': 11,
+             'Hungarian_Grand_Prix': 12, 'Italian_Grand_Prix': 13, 'Japanese_Grand_Prix': 14,
+             'Mexico_City_Grand_Prix': 15, 'Miami_Grand_Prix': 16, 'Monaco_Grand_Prix': 17,
+             'Sao_Paulo_Grand_Prix': 18, 'Saudi_Arabian_Grand_Prix': 19, 'Singapore_Grand_Prix': 20,
+             'Spanish_Grand_Prix': 21, 'United_States_Grand_Prix': 22}
 
 
 # function to determine cache location of fastf1 data

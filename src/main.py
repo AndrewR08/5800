@@ -8,14 +8,16 @@ def main():
     cache(True)     #True for desktop, False for mac
     year = 2022
 
-    #get user input for track
-    from data import lap_dict, track_dict
-    keys = list(lap_dict.keys())
+    # Get user input for track using track dictionary
+    from data import race_dict
+    keys = list(race_dict.keys())
     for i in range(len(keys)):
         print((i+1), keys[i])
-    inv_track_dict = {v: k for k, v in track_dict.items()}
-    track_input = int(input("\n Select Race (1-" + str(len(keys)) + "): "))
-    track = inv_track_dict[track_input]
+
+    inv_race_dict = {v: k for k, v in race_dict.items()}
+    race_input = int(input("\n Select Race (1-" + str(len(keys)) + "): "))
+    track = inv_race_dict[race_input]
+
     print(track)
 
     df_filename = 'GAP_2D.csv'
